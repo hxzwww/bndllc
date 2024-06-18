@@ -8,12 +8,12 @@ class Detector:
     in video files using the YOLOv5 model.
 
     Attributes:
-        model (YOLOv5): YOLOv5s model for object detection.
-        cap (cv2.VideoCapture): Video capture object for reading video files.
-        fps (float): Frames per second of the input video.
-        frame_height (int): Height of the video frames.
-        frame_width (int): Width of the video frames.
-        frames (list): List of processed video frames.
+        __model (YOLOv5): YOLOv5s model for object detection.
+        __cap (cv2.VideoCapture): Video capture object for reading video files.
+        __fps (float): Frames per second of the input video.
+        __frame_height (int): Height of the video frames.
+        __frame_width (int): Width of the video frames.
+        __frames (list): List of processed video frames.
     """
 
     def __init__(self):
@@ -21,12 +21,12 @@ class Detector:
         Initializes the Detector object with the YOLOv5 model
         and sets up attributes for video processing.
         """
-        self.model = YOLOv5('yolov5s.pt')
-        self.cap = None
-        self.fps = None
-        self.frame_height = None
-        self.frame_width = None
-        self.frames = None
+        self.__model = YOLOv5('yolov5s.pt')
+        self.__cap = None
+        self.__fps = None
+        self.__frame_height = None
+        self.__frame_width = None
+        self.__frames = None
 
     def load(self, input_file):
         """
@@ -38,7 +38,7 @@ class Detector:
         Returns:
             None
         """
-        self.cap = cv2.VideoCapture(input_file)
+        self.__cap = cv2.VideoCapture(input_file)
 
     def save(self, output_file):
         """
@@ -52,9 +52,9 @@ class Detector:
         """
         output_video = cv2.VideoWriter(
             output_file, cv2.VideoWriter_fourcc(*'mp4v'),
-            self.fps, (self.frame_width, self.frame_height)
+            self.__fps, (self.__frame_width, self.__frame_height)
         )
-        for frame in self.frames:
+        for frame in self.__frames:
             output_video.write(frame)
         output_video.release()
 
@@ -66,18 +66,18 @@ class Detector:
         Returns:
             None
         """
-        if self.cap is None:
+        if self.__cap is None:
             print('Load file before running.')
             return
 
-        self.frames = []
-        self.fps = self.cap.get(cv2.CAP_PROP_FPS)
-        self.frame_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.frame_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.__frames = []
+        self.__fps = self.__cap.get(cv2.CAP_PROP_FPS)
+        self.__frame_width = int(self.__cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.__frame_height = int(self.__cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
         self.__process()
 
-        self.cap.release()
+        self.__cap.release()
 
     def __process(self):
         """
@@ -88,12 +88,12 @@ class Detector:
         Returns:
             None
         """
-        while self.cap.isOpened():
-            ret, frame = self.cap.read()
+        while self.__cap.isOpened():
+            ret, frame = self.__cap.read()
             if not ret:
                 break
 
-            results = self.model.predict(frame)
+            results = self.__model.predict(frame)
 
             for det in results.xyxy[0]:
                 xyxy = det[:4].cpu().numpy().astype(int)
@@ -110,4 +110,4 @@ class Detector:
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.5, (0, 255, 0), 2
                     )
-            self.frames.append(frame)
+            self.__frames.append(frame)
