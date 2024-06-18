@@ -1,4 +1,4 @@
-## Detecting persons in video using YOLOv5
+## Detecting persons in video via YOLOv5
 
 before start: `make venv && make install`
 
